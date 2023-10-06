@@ -7,9 +7,10 @@ import crawler
 
 
 
-crawler = crawler.Crawler()
-flexformlabel = crawler.extractFromFlexform()
-ecadeiraslabel = crawler.extractFromECadeiras()
+crawler = crawler.Crawler() # Cria uma objeto da classe Crawler.
+flexformlabel = crawler.extractFromFlexform() # Extrai dados da Flexform.
+ecadeiraslabel = crawler.extractFromECadeiras() # Extrai dados da E-Cadeiras.
+# Abaixo é printado os dados de maneira organizada.
 print("Tabela E-Cadeiras:\n")
 crawler.toString(ecadeiraslabel[0], ecadeiraslabel[1])
 print("\nTabela Flexform:\n")

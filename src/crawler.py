@@ -3,18 +3,18 @@ from bs4 import BeautifulSoup
 
 class Crawler:
 
-    def requestData(self, url: str):
+    def requestData(self, url: str): # Extrai dados de um determinado site.
         content = requests.get(url)
         site = BeautifulSoup(content.text, 'html.parser')
         return site
 
-    def extractFromFlexform(self):
+    def extractFromFlexform(self): # Extrai o nome e o valor das cadeiras do site da flexform.
         siteFlexform = self.requestData("https://www.flexform.com.br/cadeiras/cadeiras-de-escritorio")
         productname = siteFlexform.find_all('a', attrs={'class' : 'produto__title'})
         productprice = siteFlexform.find_all('p', attrs={'class' : 'produto__price'})
         return productname, productprice
 
-    def toString(self, productname: str, productprice: float):
+    def toString(self, productname: str, productprice: float): # Printa de forma organizada o nome de uma cadeira e seu valor.
         tamanho1 = len(productname)
         tamanho2 = len(productprice)
         a = 0
@@ -25,7 +25,7 @@ class Crawler:
             tamanho1 -= 1
             tamanho2 -= 1
 
-    def extractFromECadeiras(self):
+    def extractFromECadeiras(self): # Extrai o nome e o valor das cadeiras do site da E-Cadeiras.
         siteECadeiras = self.requestData("https://www.e-cadeiras.com.br/cadeiras/cadeiras-de-escritorio")
         productname = siteECadeiras.find_all('h3', attrs={'class' : 'product-name'})
         productprice = siteECadeiras.find_all('span', attrs={'class' : 'price-best'})
