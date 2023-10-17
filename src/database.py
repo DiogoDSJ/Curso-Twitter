@@ -18,7 +18,10 @@ class Database:
         for product in self.products.find():
             if product['title'].lower().find(productName.lower()) != -1:
                 searchResult.append(product)
-        return searchResult
+        if len(searchResult) == 0:
+            return None
+        else:
+            return searchResult
     def insert(self, data: dict) -> dict | None:
         query = {'title': data['title']}
         result = self.products.find_one(query, sort=[('date', -1)])

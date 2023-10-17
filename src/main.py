@@ -8,4 +8,8 @@ string = "Lite"
 crawler = crawler.Crawler() # Cria uma objeto da classe Crawler.
 crawler.extractFromFlexform()
 crawler.extractFromECadeiras(5)
-print(crawler.db.search(string))
+if crawler.db.search(string) is None:
+    print("Nenhum dado foi encontrado.")
+else:
+    for product in crawler.db.search(string):
+        print(product)
