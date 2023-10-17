@@ -27,9 +27,9 @@ class Crawler:
             productlink = product.find('a', attrs={'class' : 'produto__title'}).get('href').strip()
             offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
             response = self.db.insert(offer)
-            if response is not None:
+            if response is not None: # Se o produto não existe, ou seu preço foi atualizado.
                 print("Oferta foi adicionada/atualizada.")
-            else:
+            else: # Produto não teve valor alterado.
                 print("Produto não teve seu valor alterado.")
 
 
@@ -45,8 +45,8 @@ class Crawler:
                 productlink = product.find('h3', attrs={'class' : 'product-name'}).a.get('href')
                 offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
                 response = self.db.insert(offer)
-                if response is not None:
+                if response is not None: # Se o produto não existe, ou seu preço foi atualizado.
                     print("Oferta foi adicionada/atualizada.")
-                else:
+                else: # produto não teve valor alterado.
                     print("Produto não teve seu valor alterado.")
             page+=1
