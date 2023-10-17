@@ -1,7 +1,16 @@
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+import os
+from database import Database
+
 
 class Crawler:
+
+    def __init__(self):
+        load_dotenv()
+        self.db = Database()
 
     def requestData(self, url: str): # Extrai dados de um determinado site.
         content = requests.get(url)
@@ -9,25 +18,35 @@ class Crawler:
         return site
 
     def extractFromFlexform(self): # Extrai o nome e o valor das cadeiras do site da flexform.
-        siteFlexform = self.requestData("https://www.flexform.com.br/cadeiras/cadeiras-de-escritorio")
-        productname = siteFlexform.find_all('a', attrs={'class' : 'produto__title'})
-        productprice = siteFlexform.find_all('p', attrs={'class' : 'produto__price'})
-        return productname, productprice
+        siteFlexform = self.requestData(os.getenv("FLEXFORM") + f'/cadeiras/cadeiras-de-escritorio?_offset=0&_limit=96&_sort=&')
+        products = siteFlexform.find_all('article', attrs={'class' : 'produto'})
+        for product in products:
+            productname = product.find('a', attrs={'class' : 'produto__title'}).text.strip()
+            productprice = product.find('p', attrs={'class' : 'produto__price'}).text.strip()
+            productimage = product.find('img', attrs={'class' : 'img-fluid'}).get('src').strip()
+            productlink = product.find('a', attrs={'class' : 'produto__title'}).get('href').strip()
+            offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
+            response = self.db.insert(offer)
+            if response is not None:
+                print("Oferta foi adicionada/atualizada.")
+            else:
+                print("Produto não teve seu valor alterado.")
 
-    def toString(self, productname: str, productprice: float): # Printa de forma organizada o nome de uma cadeira e seu valor.
-        tamanho1 = len(productname)
-        tamanho2 = len(productprice)
-        a = 0
-        while (tamanho1 != 0 or tamanho2 != 0):
-            print(productname[a].text.strip())
-            print(productprice[a].text.strip())
-            a += 1
-            tamanho1 -= 1
-            tamanho2 -= 1
 
-    def extractFromECadeiras(self): # Extrai o nome e o valor das cadeiras do site da E-Cadeiras.
-        siteECadeiras = self.requestData("https://www.e-cadeiras.com.br/cadeiras/cadeiras-de-escritorio")
-        productname = siteECadeiras.find_all('h3', attrs={'class' : 'product-name'})
-        productprice = siteECadeiras.find_all('span', attrs={'class' : 'price-best'})
-        return productname, productprice
-
+    def extractFromECadeiras(self, pages: int = 1): # Extrai o nome e o valor das cadeiras do site da E-Cadeiras.
+        page = 1
+        while(page <= pages):
+            siteECadeiras = self.requestData(os.getenv("ECADEIRAS") + f"/buscapagina?fq=C%3a%2f6331%2f6334%2f&PS=40&sl=fc437e63-3393-44cb-a1db-d941aacb6990&cc=4&sm=0&PageNumber={page}")
+            products = siteECadeiras.find_all('li', attrs={'layout' : 'fc437e63-3393-44cb-a1db-d941aacb6990'})
+            for product in products:
+                productname = product.find('h3', attrs={'class' : 'product-name'}).text.strip()
+                productprice = product.find('span', attrs={'class' : 'price-best'}).text.strip()
+                productimage = product.find('figure', attrs={'class' : 'product-image'}).img.get('src')
+                productlink = product.find('h3', attrs={'class' : 'product-name'}).a.get('href')
+                offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
+                response = self.db.insert(offer)
+                if response is not None:
+                    print("Oferta foi adicionada/atualizada.")
+                else:
+                    print("Produto não teve seu valor alterado.")
+            page+=1
