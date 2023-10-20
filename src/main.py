@@ -1,15 +1,19 @@
+from datetime import datetime
+
+import schedule
+
 import crawler
 
 # https://www.e-cadeiras.com.br/cadeiras/cadeiras-de-escritorio
 # https://www.flexform.com.br/cadeiras/cadeiras-de-escritorio
 
+def job():
+    print("\n Execute job. Time: {}".format(str(datetime.now())))
+    crawler.execute(2)
 
-string = "Lite"
 crawler = crawler.Crawler() # Cria uma objeto da classe Crawler.
-crawler.extractFromFlexform()
-crawler.extractFromECadeiras(5)
-if crawler.db.search(string) is None:
-    print("Nenhum dado foi encontrado.")
-else:
-    for product in crawler.db.search(string):
-        print(product)
+schedule.every(1).minutes.do(job)
+while True:
+    schedule.run_pending()
+
+

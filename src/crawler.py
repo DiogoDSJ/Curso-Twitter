@@ -1,16 +1,18 @@
 from datetime import datetime
 import requests
+import schedule
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 from database import Database
-
+from bot import BOT
 
 class Crawler:
 
     def __init__(self):
         load_dotenv()
         self.db = Database()
+        self.bot = BOT()
 
     def requestData(self, url: str): # Extrai dados de um determinado site.
         content = requests.get(url)
@@ -28,7 +30,7 @@ class Crawler:
             offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
             response = self.db.insert(offer)
             if response is not None: # Se o produto não existe, ou seu preço foi atualizado.
-                print("Oferta foi adicionada/atualizada.")
+                print(self.bot.post(response))
             else: # Produto não teve valor alterado.
                 print("Produto não teve seu valor alterado.")
 
@@ -46,7 +48,11 @@ class Crawler:
                 offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
                 response = self.db.insert(offer)
                 if response is not None: # Se o produto não existe, ou seu preço foi atualizado.
-                    print("Oferta foi adicionada/atualizada.")
+                    self.bot.post(response)
                 else: # produto não teve valor alterado.
                     print("Produto não teve seu valor alterado.")
             page+=1
+
+    def execute(self, num_pages: int = 1):
+        self.extractFromFlexform()
+        self.extractFromECadeiras(num_pages)

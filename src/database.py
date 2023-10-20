@@ -28,8 +28,11 @@ class Database:
         if result is None:
             self.products.insert_one(data)
             return data
-        elif result['price'] > data['price'] or result['price'] < data['price']:
-            self.products.insert_one(data)
-            return data
+        elif result['price'] > data['price']:
+            product = data.copy()
+            product["oldprice"] = result['price']
+            self.products.delete_one(data)
+            self.products.insert_one(product)
+            return product
         else:
             return None
