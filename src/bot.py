@@ -29,7 +29,7 @@ class BOT:
 
     def post(self, data: dict):
         try:
-            post = f"{data['title']}\n\nValor antigo: {data['oldprice']}\nValor novo: {data['price']}\n\nLink para a oferta: {data['link']}"
+            post = f"{data['title']}\n\nValor antigo: R$  {data['oldprice']}\nValor novo: R$  {data['price']}\n\nLink para a oferta: {data['link']}"
             imageLink = data['image']
             if imageLink != "":
                 path = r'C:\Users\larip\OneDrive\Documentos\PBL\Curso-Twitter\src\tmp\{}.jpg'.format((data['date']).strftime("%Y-%m-%d_%H-%M-%S"))

@@ -18,19 +18,22 @@ class Crawler:
         content = requests.get(url)
         site = BeautifulSoup(content.text, 'html.parser')
         return site
-
+    @staticmethod
+    def formatPrice(price: str):
+        return float(price.replace('R$', '').replace('.', '').replace(',', '.'))
     def extractFromFlexform(self): # Extrai o nome e o valor das cadeiras do site da flexform.
         siteFlexform = self.requestData(os.getenv("FLEXFORM") + f'/cadeiras/cadeiras-de-escritorio?_offset=0&_limit=96&_sort=&')
         products = siteFlexform.find_all('article', attrs={'class' : 'produto'})
         for product in products:
             productname = product.find('a', attrs={'class' : 'produto__title'}).text.strip()
             productprice = product.find('p', attrs={'class' : 'produto__price'}).text.strip()
+            productprice = self.formatPrice(productprice)
             productimage = product.find('img', attrs={'class' : 'img-fluid'}).get('src').strip()
             productlink = product.find('a', attrs={'class' : 'produto__title'}).get('href').strip()
             offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db
             response = self.db.insert(offer)
             if response is not None: # Se o produto não existe, ou seu preço foi atualizado.
-                print(self.bot.post(response))
+                self.bot.post(response)
             else: # Produto não teve valor alterado.
                 print("Produto não teve seu valor alterado.")
 
@@ -43,6 +46,10 @@ class Crawler:
             for product in products:
                 productname = product.find('h3', attrs={'class' : 'product-name'}).text.strip()
                 productprice = product.find('span', attrs={'class' : 'price-best'}).text.strip()
+                try:
+                    productprice = self.formatPrice(productprice)
+                except Exception as e:
+                    break
                 productimage = product.find('figure', attrs={'class' : 'product-image'}).img.get('src')
                 productlink = product.find('h3', attrs={'class' : 'product-name'}).a.get('href')
                 offer = {"title": productname, "price": productprice, "image": productimage, "link": productlink , "date" : datetime.now()} # put in db

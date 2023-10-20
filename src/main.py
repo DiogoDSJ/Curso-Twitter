@@ -9,11 +9,10 @@ import crawler
 
 def job():
     print("\n Execute job. Time: {}".format(str(datetime.now())))
-    crawler.execute(2)
+    crawler.execute(5)
 
 crawler = crawler.Crawler() # Cria uma objeto da classe Crawler.
 schedule.every(1).minutes.do(job)
+#crawler.execute(5)
 while True:
     schedule.run_pending()
-
-
