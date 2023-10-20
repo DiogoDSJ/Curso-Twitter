@@ -10,3 +10,5 @@ brasileiros. De que forma? a partir da publicação de promoções de cadeiras e
 
 - 1 - Basta executar o arquivo main.py com seu compilador python preferido.
 
+<h3> Link do robô </h3>
+https://twitter.com/antiescoliose
